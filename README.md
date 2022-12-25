@@ -36,7 +36,7 @@ You can use the tf.keras.Model.compile() method to configure the model for train
 # Evaluation
 To evaluate the model's performance, you can use the tf.keras.Model.evaluate() method to compute metrics such as accuracy, precision, and recall on the validation or test data. You can also use the tf.keras.Model.predict() method to generate audio samples from the model and compare them to the ground truth data.
 
-References
+# References
 [1] Oord, A. V. D., Dieleman, S., Zen, H., Simonyan, K., Vinyals, O., Graves, A., ... Kavukcuoglu, K. (2016). WaveNet: A Generative Model for Raw Audio. arXiv preprint arXiv:1609.03499.
 
 [2] Radford, A., Wu, J., Child, R., Luan, D., Amodei, D., & Sutskever, I. (2019). Language Models are Unsupervised Multitask Learners. OpenAI.
