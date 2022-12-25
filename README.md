@@ -20,8 +20,37 @@ To run this code, you will need the following software:
 To train the model, run the train.py script with the following command:
 
 ```
-python train.
+python train.py
 ```
+
+You can specify the following arguments to control the training process:
+
+- `--batch_size`: The batch size to use for training
+- `--epochs`: The number of epochs to train the model for
+- `--learning_rate`: The learning rate to use for the optimizer
+- `--data_dir`: The directory where the data is stored
+To evaluate the model, run the `evaluate.py` script with the following command:
+
+```
+python evaluate.py
+```
+
+You can specify the following arguments to control the evaluation process:
+
+- --batch_size: The batch size to use for evaluation
+- --data_dir: The directory where the data is stored
+To generate audio samples from the model, run the infer.py script with the following command:
+
+```
+python infer.py
+```
+
+You can specify the following arguments to control the inference process:
+
+- --batch_size: The batch size to use for inference
+- --num_samples: The number of audio samples to generate
+- --input_text: The input text to use as a condition for the audio generation
+
 
 # Data
 The model is trained on a dataset of chat transcriptions and corresponding audio waveforms. The data can be in any format that is compatible with the WaveNet and ChatGPT models. For example, the transcriptions can be tokenized and encoded as integer sequences, and the waveforms can be represented as NumPy arrays or TensorFlow tensors.
