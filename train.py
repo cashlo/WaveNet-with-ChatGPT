@@ -5,6 +5,8 @@ import tensorflow as tf
 import numpy as np
 import librosa
 
+from model import WaveNetModel
+
 # Parse command line arguments
 parser = argparse.ArgumentParser()
 parser.add_argument('--batch_size', type=int, default=64, help='Batch size')
@@ -33,10 +35,12 @@ def create_dataset(data_dir):
   dataset = dataset.batch(args.batch_size)
   dataset = dataset.repeat(args.epochs)
 
-# Split the dataset into training and validation sets
-train_size = int(0.8 * len(filenames))
-val_size = len(filenames) - train_size
-train_dataset, val_dataset = dataset.skip(val_size).take(train_size), dataset.take(val_size)
+  # Split the dataset into training and validation sets
+  train_size = int(0.8 * len(filenames))
+  val_size = len(filenames) - train_size
+  train_dataset, val_dataset = dataset.skip(val_size).take(train_size), dataset.take(val_size)
+
+  return train_dataset, val_dataset
 
 # Define the model
 model = WaveNetModel()
@@ -45,6 +49,8 @@ model = WaveNetModel()
 loss = tf.keras.losses.MeanSquaredError()
 optimizer = tf.keras.optimizers.Adam(learning_rate=args.learning_rate)
 model.compile(optimizer=optimizer, loss=loss)
+
+train_dataset, val_dataset = create_dataset(args.data_dir)
 
 # Train the model
 model.fit(train_dataset, epochs=args.epochs, validation_data=val_dataset)
