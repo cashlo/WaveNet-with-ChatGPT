@@ -1,8 +1,12 @@
 # Use the TensorFlow GPU image as the base image
 FROM tensorflow/tensorflow:latest-gpu
 
-# Install additional libraries and dependencies
-RUN apt-get update && apt-get install -y librosa-dev
+# Install system dependencies
+RUN apt-get update && apt-get install -y libsndfile1
+
+# Install additional Python dependencies
+COPY requirements.txt .
+RUN pip install -r requirements.txt
 
 # Copy the project files to the image
 COPY . /app
