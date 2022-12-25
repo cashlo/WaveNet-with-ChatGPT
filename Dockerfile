@@ -2,11 +2,7 @@
 FROM tensorflow/tensorflow:latest-gpu
 
 # Install system dependencies
-RUN apt-get update && apt-get install -y libsndfile1
-
-# Install additional Python dependencies
-COPY requirements.txt .
-RUN pip install -r requirements.txt
+RUN apt-get update && apt-get install -y libsndfile1 ffmpeg
 
 # Copy the project files to the image
 COPY . /app

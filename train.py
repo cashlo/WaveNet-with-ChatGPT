@@ -28,10 +28,18 @@ def load_and_preprocess_data(filename):
 def create_dataset(data_dir):
   # List all the audio files in the data directory
   filenames = [os.path.join(data_dir, f) for f in os.listdir(data_dir) if f.endswith('.wav') or f.endswith('.mp3')]
+  audio_tensors = [load_and_preprocess_data(f) for f in filenames]
+
+  # Find the maximum length of the audio tensors
+  max_length = max([t.shape[0] for t in audio_tensors])
+  print(max_length)
+  for t in audio_tensors: print(t.shape)
+
+  # Pad the shorter tensors with zeros
+  audio_tensors = [tf.pad(t, [[0, max_length - t.shape[0]]]) for t in audio_tensors]
 
   # Create a dataset object that loads and preprocesses the audio files
-  dataset = tf.data.Dataset.from_tensor_slices(filenames)
-  dataset = dataset.map(load_and_preprocess_data)
+  dataset = tf.data.Dataset.from_tensor_slices(audio_tensors)
   dataset = dataset.batch(args.batch_size)
   dataset = dataset.repeat(args.epochs)
 
@@ -48,7 +56,7 @@ model = WaveNetModel()
 # Compile the model
 loss = tf.keras.losses.MeanSquaredError()
 optimizer = tf.keras.optimizers.Adam(learning_rate=args.learning_rate)
-model.compile(optimizer=optimizer, loss=loss)
+model.compile(optimizer=optimizer, loss=loss, run_eagerly=True)
 
 train_dataset, val_dataset = create_dataset(args.data_dir)
 
