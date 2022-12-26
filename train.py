@@ -18,10 +18,14 @@ args = parser.parse_args()
 # Load and preprocess the data
 def load_and_preprocess_data(filename):
   # Load the audio file as a waveform
+  print(f"loading {filename}...")
   waveform, sr = librosa.load(filename)
 
   # Convert the waveform to a tensor
   waveform_tensor = tf.convert_to_tensor(waveform, dtype=tf.float32)
+
+  # Reshape the tensor to fit the input of the Conv1D layer
+  waveform_tensor = tf.reshape(waveform_tensor, (-1, 1))
 
   return waveform_tensor
 
@@ -32,14 +36,20 @@ def create_dataset(data_dir):
 
   # Find the maximum length of the audio tensors
   max_length = max([t.shape[0] for t in audio_tensors])
-  print(max_length)
-  for t in audio_tensors: print(t.shape)
-
+  
   # Pad the shorter tensors with zeros
-  audio_tensors = [tf.pad(t, [[0, max_length - t.shape[0]]]) for t in audio_tensors]
+  print(audio_tensors)
+  audio_tensors = [tf.pad(t, [[0,max_length - t.shape[0]], [0, 0]]) for t in audio_tensors]
+
+  # Create the output tensors
+  output_tensors = [tf.slice(t, [1, 0], [t.shape[0]-1, t.shape[1]]) for t in audio_tensors]
+  output_tensors = [tf.pad(t, [[0,1], [0, 0]]) for t in output_tensors]
+
 
   # Create a dataset object that loads and preprocesses the audio files
-  dataset = tf.data.Dataset.from_tensor_slices(audio_tensors)
+  input_dataset = tf.data.Dataset.from_tensor_slices(audio_tensors)
+  output_dataset = tf.data.Dataset.from_tensor_slices(output_tensors)
+  dataset = tf.data.Dataset.zip((input_dataset, output_dataset))
   dataset = dataset.batch(args.batch_size)
   dataset = dataset.repeat(args.epochs)
 
@@ -60,6 +70,12 @@ model.compile(optimizer=optimizer, loss=loss, run_eagerly=True)
 
 train_dataset, val_dataset = create_dataset(args.data_dir)
 
+print("Training set:")
+for element in train_dataset: print(element)
+print("Validation set:")
+for element in val_dataset: print(element)
+
+
 # Train the model
 model.fit(train_dataset, epochs=args.epochs, validation_data=val_dataset)
 
@@ -68,4 +84,4 @@ val_loss = model.evaluate(val_dataset)
 print(f'Validation loss: {val_loss:.4f}')
 
 # Save the model
-model.save('wavenet.h5')
+model.save_weights('weights.h5')

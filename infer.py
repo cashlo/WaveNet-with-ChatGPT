@@ -10,7 +10,8 @@ parser.add_argument('--output_path', type=str, required=True, help='Path to the 
 args = parser.parse_args()
 
 # Load the trained model
-model = tf.keras.models.load_model(args.model_path)
+model = WaveNetModel()
+model.load_weights(args.model_path)
 
 # Load the input audio file
 waveform, sr = librosa.load(args.input_path)
