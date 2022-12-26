@@ -1,5 +1,10 @@
 # WaveNet with ChatGPT
  This is a WaveNet implementation created with ChatGPT, the following is what ChatGPT want to put in README, it may or may not actually work.
+ Actual usage: 
+```bash
+docker build -t wavenet .
+docker run -v %cd%:/app wavenet python train.py
+```
 
 ## Introduction
 WaveNet is a deep learning model that was introduced by DeepMind in the paper "WaveNet: A Generative Model for Raw Audio" [1]. It is a variant of the Convolutional Neural Network (CNN) architecture that is specifically designed for generating high-quality audio waveforms.
