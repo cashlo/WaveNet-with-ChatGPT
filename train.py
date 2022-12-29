@@ -53,7 +53,8 @@ def create_dataset(data_dir):
   # Create the output tensors
   output_tensors = [tf.slice(t, [1, 0], [t.shape[0]-1, t.shape[1]]) for t in audio_tensors]
   output_tensors = [tf.pad(t, [[0,1], [0, 0]]) for t in output_tensors]
-
+  output_tensors = [tf.one_hot(t, depth=256, axis=-1) for t in output_tensors]
+  
 
   # Create a dataset object that loads and preprocesses the audio files
   input_dataset = tf.data.Dataset.from_tensor_slices(audio_tensors)
@@ -73,7 +74,7 @@ def create_dataset(data_dir):
 model = WaveNetModel()
 
 # Compile the model
-loss = tf.keras.losses.MeanSquaredError()
+loss = tf.keras.losses.CategoricalCrossentropy()
 optimizer = tf.keras.optimizers.Adam(learning_rate=args.learning_rate)
 model.compile(optimizer=optimizer, loss=loss)
 

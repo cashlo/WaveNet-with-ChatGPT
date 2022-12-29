@@ -25,6 +25,9 @@ class WaveNetModel(tf.keras.Model):
       dense_layer = tf.keras.layers.Dense(1)
       self.dense_layers.append(dense_layer)
       
+    # Add a final dense layer with the softmax activation
+    self.final_dense = tf.keras.layers.Dense(256, activation='softmax')
+      
   def call(self, inputs):
     # Map the input data to its embedded representation
     x = self.embedding(inputs)
@@ -33,5 +36,5 @@ class WaveNetModel(tf.keras.Model):
       x = self.conv_layers[i](x)
       x = self.dense_layers[i](x)
     
-    # Apply softmax to the output
-    return tf.keras.activations.softmax(x)
+    # Apply the final dense layer with the softmax activation
+    return self.final_dense(x)
