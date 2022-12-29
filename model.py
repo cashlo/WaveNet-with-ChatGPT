@@ -1,15 +1,19 @@
 import tensorflow as tf
 
 class WaveNetModel(tf.keras.Model):
-  def __init__(self, num_filters=16, kernel_size=3, dilation_rates=None):
+  def __init__(self, num_filters=8, kernel_size=3, dilation_rates=None, embedding_size=2):
     super(WaveNetModel, self).__init__()
     self.num_filters = num_filters
     self.kernel_size = kernel_size
+    self.embedding_size = embedding_size
     
     # Set the dilation rates for the layers
     if dilation_rates is None:
       dilation_rates = [2**i for i in range(num_filters)]
       
+    # Create the embedding layer
+    self.embedding = tf.keras.layers.Embedding(256, embedding_size)
+
     self.conv_layers = []
     self.dense_layers = []
     for i in range(num_filters):
@@ -22,8 +26,12 @@ class WaveNetModel(tf.keras.Model):
       self.dense_layers.append(dense_layer)
       
   def call(self, inputs):
-    x = inputs
+    # Map the input data to its embedded representation
+    x = self.embedding(inputs)
+
     for i in range(self.num_filters):
       x = self.conv_layers[i](x)
       x = self.dense_layers[i](x)
-    return x
+    
+    # Apply softmax to the output
+    return tf.keras.activations.softmax(x)

@@ -6,14 +6,16 @@ class TestModel(unittest.TestCase):
   def setUp(self):
     # Initialize the model and input data
     self.model = WaveNetModel()
-    self.model(np.random.rand(100, 1).reshape(1, 100, 1))
+    self.model(np.random.randint(0, 256, 100).reshape(1, 100, 1))
     self.model.load_weights('weights.h5')
-    self.input_data = np.random.rand(100, 1)
+    self.input_data = np.random.randint(0, 256, 100)
     self.input_data = self.input_data.reshape(1, 100, 1)
   
   def test_only_using_past_data(self):
     # Get the model's prediction for the input data
     prediction = self.model(self.input_data)
+    print(self.model.summary())
+
     
     # Check that the model's prediction only depends on past data
     for i in range(prediction.shape[0]):

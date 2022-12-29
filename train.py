@@ -6,6 +6,7 @@ import numpy as np
 import librosa
 
 from model import WaveNetModel
+from collections import Counter
 
 # Parse command line arguments
 parser = argparse.ArgumentParser()
@@ -21,13 +22,21 @@ def load_and_preprocess_data(filename):
   print(f"loading {filename}...")
   waveform, sr = librosa.load(filename)
 
-  # Convert the waveform to a tensor
-  waveform_tensor = tf.convert_to_tensor(waveform, dtype=tf.float32)
+  waveform = waveform[2000:2010]
+
+  # Convert the waveform to a mu-law encoding
+  waveform_mu_law = librosa.mu_compress(waveform)
+
+  print(Counter(waveform_mu_law))
+
+
+  # Convert the mu-law encoding to a tensor
+  waveform_mu_law_tensor = tf.convert_to_tensor(waveform_mu_law, dtype=tf.uint8)
 
   # Reshape the tensor to fit the input of the Conv1D layer
-  waveform_tensor = tf.reshape(waveform_tensor, (-1, 1))
+  waveform_mu_law_tensor = tf.reshape(waveform_mu_law_tensor, (-1, 1))
 
-  return waveform_tensor
+  return waveform_mu_law_tensor
 
 def create_dataset(data_dir):
   # List all the audio files in the data directory
@@ -66,7 +75,7 @@ model = WaveNetModel()
 # Compile the model
 loss = tf.keras.losses.MeanSquaredError()
 optimizer = tf.keras.optimizers.Adam(learning_rate=args.learning_rate)
-model.compile(optimizer=optimizer, loss=loss, run_eagerly=True)
+model.compile(optimizer=optimizer, loss=loss)
 
 train_dataset, val_dataset = create_dataset(args.data_dir)
 
@@ -74,7 +83,6 @@ print("Training set:")
 for element in train_dataset: print(element)
 print("Validation set:")
 for element in val_dataset: print(element)
-
 
 # Train the model
 model.fit(train_dataset, epochs=args.epochs, validation_data=val_dataset)
